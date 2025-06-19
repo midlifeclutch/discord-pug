@@ -6,7 +6,7 @@ A basic Discord bot intended for community 10mans organised in isk's `CS2 Commun
 
 When isk starts a queue, do the following.
 
-- `.add <elo>` this is your Elo rating, not level. This is not a gaurantee of anything.
+- `.add <elo>` this is your Elo rating, not level. This is not a guarantee of anything.
 
 Once 10 players are in the voice channel, do this.
 
