@@ -8,7 +8,7 @@ When isk starts a queue, do the following.
 
 - `.add <elo>` this is your Elo rating, not level. This is not a guarantee of anything.
 
-Once 10 players are in the voice channel, do this.
+Once 10 players are in the voice channel, and you are one of those 10 players, do this.
 
 - `.ready`
 
