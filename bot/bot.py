@@ -39,8 +39,11 @@ class Client(commands.Bot):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             self.logger.info(f'Ignoring command in #{ctx.channel}')
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f'Command is on cooldown ({error.retry_after:.0f}s).')
         else:
             raise error
+
 
     def run(self):
         super().run(self.token, reconnect=True)

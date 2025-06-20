@@ -6,9 +6,9 @@ A basic Discord bot intended for community 10mans organised in isk's `CS2 Commun
 
 When isk starts a queue, do the following.
 
-- `.add <elo>` this is your Elo rating, not level. This is not a guarantee of anything.
+- `.add <elo>` this is your Elo rating, not level.
 
-Once 10 players are in the voice channel, and you are one of those 10 players, do this.
+Once 10 players are in the voice channel, __and you are one of those 10 players__, do this.
 
 - `.ready`
 
@@ -18,12 +18,12 @@ Once 10 players are in the voice channel, and you are one of those 10 players, d
 
 - `.add <elo>`: Add yourself to the current queue.
 - `.ready`: Notify the bot you're ready.
+- `.queue`: Shows everyone who queued
 
 ### Admin Commands
 
-There's no checks in place for these at the moment, don't troll please.
-
 - `.start`: Starts a queue
+  - `.start` has optional arguments:
+    - `--noq`: By default you are automatically added to the queue, disable this behaviour.
 - `.stop`: Stops and empties the queue
-- `.queue`: Shows everyone who queued
 - `.suggest`: Suggests the teams based on Elo, it's not perfect but it is quick.

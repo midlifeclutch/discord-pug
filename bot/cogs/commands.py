@@ -20,6 +20,11 @@ ALLOWED_CHANNELS = {
     1383801344514592839,    # isk: community-5v5
 }
 
+AUTO_QUEUE = {
+    236945107725713419: 3124,     # isk
+    84001937954967552: 1543,      # bean - testing only
+}
+
 def check_channel(*chan):
     def predicate(ctx):
         channel = ctx.channel
@@ -37,27 +42,59 @@ def probability(team_a, team_b, size=5):
 
     return (round(exp*100,2), round((1-exp)*100,2))
 
+def parse_args(args):
+    kwargs = {}
+
+    for arg in args:
+        k, v = arg.split('=')
+
+        if v.isdigit():
+            val = int(v)
+        elif v.isidentifier():
+            val = bool(v)
+        else:
+            val = v
+
+        kwargs.update({k: val})
+            
+    return kwargs
+
 class PUG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     @check_channel()
-    async def start(self, ctx):
+    @commands.has_any_role('Owner', 'Admin')
+    async def start(self, ctx, *args):
         if self.bot.queue_status:
             await ctx.send(f'{ctx.author.mention} queue already started.')
         else:
             self.bot.queue_status = True
             await ctx.send(f'{ctx.author.mention} started queue.')
 
+        if (
+                ctx.author.id in AUTO_QUEUE 
+                and ctx.author.id not in self.bot.queue 
+                and '--noq' not in args
+            ):
+            self.bot.queue[ctx.author.id] = {
+                'name': ctx.author.nick, 
+                'elo': AUTO_QUEUE[ctx.author.id],
+            }
+
     @commands.command()
     @check_channel()
+    @commands.has_any_role('Owner', 'Admin')
     async def stop(self, ctx):
         if not self.bot.queue_status:
             await ctx.send(f'{ctx.author.mention} queue already stopped.')
         else:
             self.bot.queue_status = False
             await ctx.send(f'{ctx.author.mention} queue stopped.')
+
+        if self.bot.queue:
+            self.bot.queue = []
 
     @commands.command()
     @check_channel()
@@ -99,8 +136,13 @@ class PUG(commands.Cog):
 
         await ctx.send(f'{player.mention} is ready!')
 
+        if len(self.bot.queue) == 1:
+            await ctx.send(f'10 players are `.ready`, clearing down the queue.')
+            self.bot.queue = []
+
     @commands.command()
     @check_channel()
+    @commands.cooldown(1, 30)
     async def queue(self, ctx):
         position = 0
         strings = []
@@ -108,12 +150,11 @@ class PUG(commands.Cog):
             position +=1 
             strings.append(f"`{position:02}. {v['name']} ({v['elo']})`")
 
-        self.bot.logger.debug(strings)
-            
         await ctx.send('\n'.join(strings))
 
     @commands.command()
     @check_channel()
+    @commands.has_any_role('Owner', 'Admin')
     async def suggest(self, ctx, *args):
         elo_diff = float('inf')
         team_1, team_2 = (None, None)
